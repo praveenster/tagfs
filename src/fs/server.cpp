@@ -13,6 +13,8 @@
 using std::vector;
 using lepcpplib::String;
 const short int kPort = 8888;
+const int kFileBlockSize = 32 * 1024 * 1024;
+const String k404 = "<html><head><title>File not found</title></head><body>File not found</body></html>";
 
 ssize_t file_server_callback(void *cls, uint64_t pos, char *buf, size_t max)
 {
@@ -26,15 +28,25 @@ void file_server_free_callback(void* cls)
   fclose((FILE*)cls);
 }
 
-void serve_file()
+int serve_file(MHD_Connection* connection, String& filename)
 {
-  #if 0
-  struct MHD_Response *
-MHD_create_response_from_callback (uint64_t size,
-           size_t block_size,
-           MHD_ContentReaderCallback crc, void *crc_cls,
-           MHD_ContentReaderFreeCallback crfc);
-           #endif
+  MHD_Response* response = NULL;
+  struct stat filestats;
+  int result = stat(filename.toCharArray(), &filestats);
+  if (result != -1) {
+    FILE* fp = fopen(filename.toCharArray(), "r");
+    response = MHD_create_response_from_callback (filestats.st_size,
+               kFileBlockSize, file_server_callback, fp, file_server_free_callback);
+    result = MHD_queue_response(connection, MHD_HTTP_OK, response);
+  }
+  else {
+    response = MHD_create_response_from_buffer(k404.length(),
+      (void*)k404.toCharArray(), MHD_RESPMEM_PERSISTENT);
+    result = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+  }
+
+  MHD_destroy_response(response);
+  return result;
 }
 
 int route_discover(void* cls, MHD_Connection* connection,
@@ -58,6 +70,7 @@ int route_discover(void* cls, MHD_Connection* connection,
     }
   }
 
+#if 0
   FILE* fp = fopen(filename.toCharArray(), "r");
   int fd = fileno(fp);
   struct stat buf;
@@ -70,6 +83,8 @@ int route_discover(void* cls, MHD_Connection* connection,
   result = MHD_queue_response(connection, MHD_HTTP_OK, response);
   MHD_destroy_response(response);
   return result;
+#endif
+  return serve_file(connection, filename);
 }
 
 int route_www(void* cls, MHD_Connection* connection,
