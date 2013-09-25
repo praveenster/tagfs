@@ -60,9 +60,9 @@
         <div class="row">
           <div class="col-md-8 col-md-offset-4">
             <ol class="breadcrumb">
-              <li><a href="#">Home</a></li>
-              <li><a href="#">Library</a></li>
-              <li class="active">Data</li>
+              <li><a href="#"><span class="glyphicon glyphicon-home"></span></a></li>
+              <li><a href="#">root</a></li>
+              <li class="active">home</li>
             </ol>
           </div>
         </div>
@@ -211,9 +211,13 @@
         $("#tree").dynatree({
           title: "Sample Theming",
           // Image folder used for data.icon attribute.
-          imagePath: "skin-custom/",
+          imagePath: "/discover/frameworks/dynatree/src/skin-vista/",
           onSelect: function(node) {
             alert ("You selected " + node);
+          },
+          initAjax: {
+            url: "/api/get/tags",
+            data: {}
           }
         });
       });

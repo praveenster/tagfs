@@ -15,6 +15,7 @@
 #include "JsonArray.h"
 #include "JsonNull.h"
 #include "JsonNumber.h"
+#include "JsonBool.h"
 #include "SmartPointer.h"
 
 using std::vector;
@@ -25,6 +26,7 @@ using lepcpplib::JsonString;
 using lepcpplib::JsonArray;
 using lepcpplib::JsonNull;
 using lepcpplib::JsonNumber;
+using lepcpplib::JsonBool;
 using lepcpplib::SmartPointer;
 using lepcpplib::String;
 
@@ -110,23 +112,22 @@ int route_api(void* cls, MHD_Connection* connection,
   int token_count = tokens.size();
   if ((token_count >= 4) && (tokens[2] == "get") && (tokens[3] == "tags")) {
     JsonObject* j1 = new JsonObject();
-    j1->Add(new JsonString("name"), new JsonString("root"));
+    j1->Add(new JsonString("title"), new JsonString("root"));
     j1->Add(new JsonString("id"), new JsonNumber(0));
     j1->Add(new JsonString("parent"), new JsonNull());
+    j1->Add(new JsonString("isFolder"), new JsonBool(true));
 
     JsonObject* j2 = new JsonObject();
-    j2->Add(new JsonString("name"), new JsonString("home"));
+    j2->Add(new JsonString("title"), new JsonString("home"));
     j2->Add(new JsonString("id"), new JsonNumber(1));
     j2->Add(new JsonString("parent"), new JsonString("root"));
+    j2->Add(new JsonString("isFolder"), new JsonBool(true));
 
     JsonArray* a = new JsonArray();
     a->Add(j1);
     a->Add(j2);
 
-    SmartPointer<JsonObject> j = new JsonObject();
-    j->Add(new JsonString("tags"), a);
-
-    output = j->ToString();
+    output = a->ToString();
   }
   else if ((token_count >= 5) && (tokens[2] == "get") && (tokens[3] == "tag")) {
     int tag_id = String::toInt(tokens[4].toCharArray());
