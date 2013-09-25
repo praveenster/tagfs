@@ -166,6 +166,55 @@ int route_api(void* cls, MHD_Connection* connection,
       output = j->ToString();
     }
   }
+  else if ((token_count >= 5) && (tokens[2] == "get") && (tokens[3] == "file")) {
+    int file_id = String::toInt(tokens[4].toCharArray());
+
+    if (file_id == 0) {
+      SmartPointer<JsonObject> j = new JsonObject();
+      j->Add(new JsonString("name"), new JsonString("file1.txt"));
+      j->Add(new JsonString("id"), new JsonNumber(0));
+      j->Add(new JsonString("type"), new JsonString("Text document"));
+      j->Add(new JsonString("last_modified"), new JsonString("Sat 14 Sep 2013 01:14:35 AM PDT"));
+
+      JsonObject* j1 = new JsonObject();
+      j1->Add(new JsonString("name"), new JsonString("anothertag1"));
+      j1->Add(new JsonString("id"), new JsonNumber(3));
+
+      JsonObject* j2 = new JsonObject();
+      j2->Add(new JsonString("name"), new JsonString("anothertag2"));
+      j2->Add(new JsonString("id"), new JsonNumber(4));
+
+      JsonArray* a = new JsonArray();
+      a->Add(j1);
+      a->Add(j2);
+
+      j->Add(new JsonString("tags"), a);
+      output = j->ToString();
+    }
+    else {
+      SmartPointer<JsonObject> j = new JsonObject();
+      j->Add(new JsonString("name"), new JsonString("file2.jpg"));
+      j->Add(new JsonString("id"), new JsonNumber(0));
+      j->Add(new JsonString("type"), new JsonString("JPEG image"));
+      j->Add(new JsonString("last_modified"), new JsonString("Sat 14 Sep 2013 01:14:35 AM PDT"));
+
+
+      JsonObject* j1 = new JsonObject();
+      j1->Add(new JsonString("name"), new JsonString("anothertag3"));
+      j1->Add(new JsonString("id"), new JsonNumber(4));
+
+      JsonObject* j2 = new JsonObject();
+      j2->Add(new JsonString("name"), new JsonString("anothertag4"));
+      j2->Add(new JsonString("id"), new JsonNumber(5));
+
+      JsonArray* a = new JsonArray();
+      a->Add(j1);
+      a->Add(j2);
+
+      j->Add(new JsonString("tags"), a);
+      output = j->ToString();
+    }
+  }
   else {
     SmartPointer<JsonObject> j = new JsonObject();
     j->Add(new JsonString("error"), new JsonString("invalid api"));
